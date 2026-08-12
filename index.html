@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Invest Together — a family and friends pool</title>
+<meta name="description" content="A private record of who has put money into our pool, which IPOs are open, and what we have applied for.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --ink:#0E2E2A; --ink-soft:#1A423C;
+  --paper:#F3F0E5; --paper-hi:#FBF9F2;
+  --marigold:#E39B2C; --brick:#A34A2E; --moss:#4F7346;
+  --teal:#2E7D74; --plum:#7A4A63; --sand:#C9B27C;
+  --rule:rgba(14,46,42,.14); --rule-strong:rgba(14,46,42,.32);
+  --display:"Bricolage Grotesque",system-ui,sans-serif;
+  --body:"Instrument Sans",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+  --wrap:1180px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55}
+.wrap{width:min(var(--wrap),100% - 2.5rem);margin-inline:auto}
+
+/* ── Masthead ───────────────────────────────── */
+.masthead{background:var(--ink);color:var(--paper-hi);padding:2.75rem 0 2.25rem;border-bottom:3px solid var(--marigold)}
+.masthead h1{font-family:var(--display);font-weight:800;font-size:clamp(2.6rem,9vw,5.5rem);line-height:.92;letter-spacing:-.035em;margin:0;text-transform:uppercase}
+.masthead p{margin:.9rem 0 0;max-width:44ch;font-size:1.02rem;color:rgba(251,249,242,.78)}
+.masthead .fineprint{margin-top:1.4rem;font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--marigold)}
+
+/* ── Lock bar ───────────────────────────────── */
+.lockbar{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin-top:1.6rem;padding-top:1.4rem;border-top:1px solid rgba(251,249,242,.16)}
+.lockbtn{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;padding:.5rem .85rem;border-radius:2px;border:1px solid rgba(251,249,242,.3);background:transparent;color:rgba(251,249,242,.85);cursor:pointer}
+.lockbtn:hover{border-color:var(--marigold);color:var(--marigold)}
+body.editing .lockbtn{border-color:var(--marigold);background:var(--marigold);color:var(--ink);font-weight:600}
+#lockForm{display:flex;gap:.5rem;flex-wrap:wrap}
+#lockForm input{font-family:var(--mono);font-size:.8rem;padding:.45rem .6rem;border:1px solid rgba(251,249,242,.3);border-radius:2px;background:rgba(251,249,242,.08);color:var(--paper-hi);min-width:11rem}
+#lockForm button{font-family:var(--mono);font-size:.75rem;font-weight:600;padding:.45rem .9rem;border:none;border-radius:2px;background:var(--marigold);color:var(--ink);cursor:pointer}
+#lockMsg{font-family:var(--mono);font-size:.72rem;color:var(--marigold)}
+
+/* ── Sections ───────────────────────────────── */
+section.block{padding:3rem 0 1rem}
+section.block + section.block{padding-top:1.5rem}
+.eyebrow{font-family:var(--mono);font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-soft);opacity:.65;margin:0 0 .35rem}
+.block h2{font-family:var(--display);font-weight:800;letter-spacing:-.02em;font-size:clamp(1.5rem,3.4vw,2.1rem);margin:0 0 .25rem}
+.block .lede{margin:0 0 1.4rem;max-width:64ch;color:var(--ink-soft);opacity:.85}
+
+/* ── Pool card ──────────────────────────────── */
+.pool{background:var(--ink);color:var(--paper-hi);border-radius:2px;padding:1.75rem 1.75rem 1.5rem;margin-top:.5rem}
+.pool-top{display:flex;flex-wrap:wrap;gap:1.5rem 2.5rem;align-items:baseline}
+.pool-total{font-family:var(--mono);font-weight:600;font-size:clamp(2.1rem,6.5vw,3.4rem);letter-spacing:-.03em;line-height:1}
+.pool-meta{display:flex;gap:2rem;flex-wrap:wrap;margin-left:auto}
+.pool-meta div span{display:block;font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(251,249,242,.55)}
+.pool-meta div strong{font-family:var(--mono);font-weight:500;font-size:1.15rem}
+.bar{display:flex;height:56px;margin-top:1.6rem;border-radius:2px;overflow:hidden;background:rgba(251,249,242,.08)}
+.seg{position:relative;min-width:2px;display:flex;align-items:center;justify-content:center;transform-origin:left;animation:grow .7s cubic-bezier(.22,1,.36,1) both}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.seg span{font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;color:var(--ink);padding:0 .35rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+.bar-caption{margin-top:.65rem;font-family:var(--mono);font-size:.7rem;color:rgba(251,249,242,.55);letter-spacing:.06em}
+.split-toggle{display:flex;gap:.4rem;align-items:center;margin-top:1.25rem;flex-wrap:wrap}
+.split-toggle > span{font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(251,249,242,.55);margin-right:.35rem}
+.split-toggle button{font-family:var(--mono);font-size:.74rem;padding:.4rem .75rem;border-radius:2px;border:1px solid rgba(251,249,242,.28);background:transparent;color:rgba(251,249,242,.8);cursor:pointer}
+.split-toggle button[aria-pressed="true"]{background:var(--marigold);border-color:var(--marigold);color:var(--ink);font-weight:600}
+body:not(.editing) .split-toggle button{cursor:default;pointer-events:none}
+body:not(.editing) .split-toggle button[aria-pressed="false"]{display:none}
+
+/* ── Tables ─────────────────────────────────── */
+.tablecard{background:var(--paper-hi);border:1px solid var(--rule);border-radius:2px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:720px}
+thead th{text-align:left;font-family:var(--mono);font-weight:500;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);padding:.85rem 1rem;border-bottom:1.5px solid var(--rule-strong);white-space:nowrap;background:var(--paper-hi)}
+tbody td{padding:.8rem 1rem;border-bottom:1px solid var(--rule);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:rgba(227,155,44,.07)}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.code{font-family:var(--mono);font-weight:600;letter-spacing:.06em}
+.swatch{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:.5rem}
+.muted{color:var(--ink-soft);opacity:.6}
+.sub{display:block;font-size:.74rem;color:var(--ink-soft);opacity:.68;font-family:var(--mono);white-space:nowrap}
+.pill{display:inline-block;font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;padding:.28rem .55rem;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.pill.open{color:var(--moss);background:rgba(79,115,70,.1)}
+.pill.soon{color:var(--brick);background:rgba(163,74,46,.1)}
+.pill.closed{color:var(--ink-soft);opacity:.55}
+
+.hist{font-family:var(--mono);font-size:.72rem;color:var(--teal);text-decoration:none;border-bottom:1px solid rgba(46,125,116,.4)}
+.hist:hover{border-bottom-color:var(--teal)}
+
+select.status{font-family:var(--mono);font-size:.75rem;padding:.35rem .5rem;border:1px solid var(--rule-strong);border-radius:2px;background:var(--paper);color:var(--ink);cursor:pointer;max-width:100%}
+select.status[data-tone="go"]{border-color:var(--moss);color:var(--moss);background:rgba(79,115,70,.08);font-weight:600}
+select.status[data-tone="warm"]{border-color:var(--marigold);color:#8a5c10;background:rgba(227,155,44,.13);font-weight:600}
+select.status:disabled{appearance:none;-webkit-appearance:none;opacity:1;cursor:default;padding-left:0;border-color:transparent;background:transparent}
+
+.rm{border:none;background:none;cursor:pointer;color:var(--ink);opacity:.35;font-size:1.05rem;line-height:1;padding:.25rem .4rem;border-radius:2px;font-family:var(--mono)}
+.rm:hover{opacity:1;color:var(--brick)}
+
+/* ── Owner-only chrome ──────────────────────── */
+body:not(.editing) .owner-only{display:none}
+
+details.adder{margin-top:1rem;border:1px dashed var(--rule-strong);border-radius:2px}
+details.adder > summary{cursor:pointer;list-style:none;padding:.75rem 1rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}
+details.adder > summary::-webkit-details-marker{display:none}
+details.adder > summary::before{content:"+ ";color:var(--marigold);font-weight:700}
+details.adder[open] > summary::before{content:"– "}
+.form{display:flex;flex-wrap:wrap;gap:.75rem;padding:0 1rem 1rem}
+.field{display:flex;flex-direction:column;gap:.25rem}
+.field label{font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);opacity:.75}
+.field input,.field select{font-family:var(--mono);font-size:.85rem;padding:.45rem .55rem;border:1px solid var(--rule-strong);border-radius:2px;background:var(--paper-hi);color:var(--ink);min-width:8.5rem}
+.field.wide input{min-width:15rem}
+button.go{align-self:flex-end;font-family:var(--mono);font-size:.78rem;font-weight:600;letter-spacing:.06em;padding:.5rem 1rem;border:none;border-radius:2px;background:var(--ink);color:var(--paper-hi);cursor:pointer}
+button.go:hover{background:var(--ink-soft)}
+button.ghost{font-family:var(--mono);font-size:.74rem;padding:.5rem .9rem;border-radius:2px;border:1px solid var(--rule-strong);background:transparent;color:var(--ink);cursor:pointer}
+button.ghost:hover{background:var(--paper-hi)}
+
+.save{margin-top:2.5rem;border-top:1px solid var(--rule);padding-top:1.5rem}
+.save .row{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center}
+.save textarea{width:100%;min-height:190px;margin-top:.9rem;font-family:var(--mono);font-size:.72rem;line-height:1.5;padding:.85rem;border:1px solid var(--rule-strong);border-radius:2px;background:var(--paper-hi);color:var(--ink);resize:vertical}
+.toast{font-family:var(--mono);font-size:.74rem;color:var(--moss);opacity:0;transition:opacity .25s}
+.toast.show{opacity:1}
+code{font-family:var(--mono);font-size:.88em}
+
+footer{background:var(--ink);color:rgba(251,249,242,.7);margin-top:3.5rem;padding:2.5rem 0}
+footer h3{font-family:var(--display);color:var(--paper-hi);font-size:1.1rem;margin:0 0 .6rem;letter-spacing:-.01em}
+footer h3 + ul{margin-bottom:1.8rem}
+footer ul{margin:0;padding-left:1.1rem;max-width:72ch;font-size:.9rem}
+footer li{margin-bottom:.4rem}
+footer a{color:var(--marigold)}
+footer .sig{margin-top:1.6rem;font-family:var(--mono);font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(251,249,242,.4)}
+
+:focus-visible{outline:2px solid var(--marigold);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+@media (max-width:820px){
+  table,thead,tbody,tr,td{display:block;min-width:0}
+  thead{display:none}
+  tbody tr{border-bottom:1.5px solid var(--rule-strong);padding:.5rem 0}
+  tbody tr:last-child{border-bottom:none}
+  tbody td{border-bottom:none;padding:.3rem 1rem;display:grid;grid-template-columns:9rem 1fr;gap:.75rem;align-items:center}
+  tbody td::before{content:attr(data-label);font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);opacity:.6}
+  .pool-meta{margin-left:0}
+  .sub{white-space:normal}
+}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <h1>Invest Together</h1>
+    <p>It is made for the benefits of family and friends only. Everything the pool earns goes back to the people who put money in — no fee, no cut, no profit taken by anyone running it.</p>
+    <div class="fineprint" id="asOf">Private ledger</div>
+
+    <div class="lockbar">
+      <button class="lockbtn" id="lockBtn" type="button">Editing locked — unlock</button>
+      <form id="lockForm" hidden>
+        <input type="password" id="lockPass" placeholder="Passphrase" autocomplete="current-password">
+        <button type="submit">Unlock</button>
+      </form>
+      <span id="lockMsg" role="status"></span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <section class="block wrap">
+    <p class="eyebrow">Where we stand</p>
+    <h2>The pool</h2>
+    <p class="lede">Every band below is one person. The width is what they put in.</p>
+
+    <div class="pool">
+      <div class="pool-top">
+        <div>
+          <div class="pool-total" id="poolTotal">₹0</div>
+          <div class="bar-caption" id="poolCaption">contributed so far</div>
+        </div>
+        <div class="pool-meta">
+          <div><span>Members</span><strong id="mCount">0</strong></div>
+          <div><span>Largest share</span><strong id="mMax">—</strong></div>
+          <div><span>Average</span><strong id="mAvg">—</strong></div>
+        </div>
+      </div>
+      <div class="bar" id="poolBar" role="img" aria-label="Contributions by member"></div>
+      <div class="bar-caption" id="barLegend"></div>
+      <div class="split-toggle">
+        <span>Returns split</span>
+        <button type="button" data-split="proportional" aria-pressed="true">In proportion to amount</button>
+        <button type="button" data-split="equal" aria-pressed="false">Equally per member</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="block wrap">
+    <p class="eyebrow">Who is in</p>
+    <h2>Investors</h2>
+    <p class="lede">Code names only. Nobody's real name goes on this page, so it can sit on a public link without telling anyone who we are.</p>
+
+    <div class="tablecard">
+      <table>
+        <thead><tr>
+          <th>Code name</th><th>Amount in</th><th>Share of pool</th>
+          <th>Share of returns</th><th>Joined</th><th>Note</th><th></th>
+        </tr></thead>
+        <tbody id="investorRows"></tbody>
+      </table>
+    </div>
+
+    <details class="adder owner-only">
+      <summary>Add an investor</summary>
+      <div class="form">
+        <div class="field"><label for="iCode">Code name</label><input id="iCode" placeholder="KOEL" maxlength="16"></div>
+        <div class="field"><label for="iAmt">Amount (₹)</label><input id="iAmt" type="number" min="0" step="500" placeholder="25000"></div>
+        <div class="field"><label for="iDate">Joined</label><input id="iDate" type="date"></div>
+        <div class="field wide"><label for="iNote">Note (optional)</label><input id="iNote" placeholder="Paid by UPI, 3 Aug"></div>
+        <button class="go" id="addInvestor" type="button">Add investor</button>
+      </div>
+    </details>
+  </section>
+
+  <section class="block wrap">
+    <p class="eyebrow">The market</p>
+    <h2>IPOs — open and opening</h2>
+    <p class="lede">Open now sits at the top, then the ones opening soon, then whatever has closed. Status is worked out from the dates. <strong>Lots we can fund</strong> is the pool divided by the cost of one lot at the upper price, so it shows what the pot could actually cover today.</p>
+
+    <div class="tablecard">
+      <table>
+        <thead><tr>
+          <th>IPO</th><th>Window</th><th>Status</th><th>Price band</th>
+          <th>Lot</th><th>Cost per lot</th><th>Lots we can fund</th>
+          <th>Applied / applying</th><th></th>
+        </tr></thead>
+        <tbody id="ipoRows"></tbody>
+      </table>
+    </div>
+
+    <details class="adder owner-only">
+      <summary>Add an IPO</summary>
+      <div class="form">
+        <div class="field wide"><label for="pName">Company</label><input id="pName" placeholder="Example Industries Ltd"></div>
+        <div class="field"><label for="pSeg">Segment</label><select id="pSeg"><option>Mainboard</option><option>SME</option></select></div>
+        <div class="field"><label for="pOpen">Opens</label><input id="pOpen" type="date"></div>
+        <div class="field"><label for="pClose">Closes</label><input id="pClose" type="date"></div>
+        <div class="field"><label for="pLow">Price low (₹)</label><input id="pLow" type="number" step="1" placeholder="118"></div>
+        <div class="field"><label for="pHigh">Price high (₹)</label><input id="pHigh" type="number" step="1" placeholder="125"></div>
+        <div class="field"><label for="pLot">Shares in a lot</label><input id="pLot" type="number" step="1" placeholder="120"></div>
+        <div class="field wide"><label for="pUrl">Reference link (optional)</label><input id="pUrl" placeholder="https://www.chittorgarh.com/ipo/..."></div>
+        <button class="go" id="addIpo" type="button">Add IPO</button>
+      </div>
+    </details>
+  </section>
+
+  <section class="block wrap owner-only">
+    <div class="save">
+      <p class="eyebrow">Keeping your changes</p>
+      <h2 style="font-size:1.25rem;margin-bottom:.4rem">Save back to GitHub</h2>
+      <p class="lede" style="margin-bottom:1rem">Edits here live only in this browser tab. To keep them, copy the data block and paste it over the <code>const DATA = {…}</code> block near the bottom of <code>index.html</code>, then commit.</p>
+      <div class="row">
+        <button class="ghost" id="copyData" type="button">Copy data block</button>
+        <button class="ghost" id="showData" type="button">Show it instead</button>
+        <span class="toast" id="toast"></span>
+      </div>
+      <textarea id="dataOut" spellcheck="false" hidden aria-label="Data block to paste into index.html"></textarea>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <h3>Before anyone sends money, three things everyone should know</h3>
+    <ul>
+      <li><strong>One PAN can submit only one application per IPO.</strong> Duplicate applications on the same PAN get rejected, so a pool cannot multiply anyone's chances of allotment by applying many times under one name.</li>
+      <li><strong>Shares land in one person's demat account.</strong> Whoever applies legally holds them. Write down what everyone has agreed, in plain language, and keep a copy.</li>
+      <li><strong>Pooling other people's money to invest carries rules.</strong> In India that can bring in SEBI regulation depending on how it is run. Worth an hour with a chartered accountant before the first rupee moves. This page is a record book, not advice — I'm not a financial adviser or a lawyer.</li>
+    </ul>
+    <div class="sig">Invest Together · family and friends only · no profit taken</div>
+  </div>
+</footer>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   1. YOUR PASSPHRASE
+   Only someone with this can turn on editing. Store the SHA-256
+   hash, never the passphrase itself. To make a new one, run:
+       printf '%s' 'your new passphrase' | shasum -a 256
+   and paste the result below. Default passphrase is "change-me".
+   ═══════════════════════════════════════════════════════════════ */
+const PASS_HASH = "e2186dbdb1bb4193608605e84f33208765b5693b55edd4f730a719a100eeea6f";
+
+/* ═══════════════════════════════════════════════════════════════
+   2. YOUR DATA — the only part you edit by hand.
+   Dates are YYYY-MM-DD. Amounts are plain numbers, no commas.
+   link is an optional URL for the "Details" link on an IPO row.
+   ═══════════════════════════════════════════════════════════════ */
+const DATA = {
+  "returnSplit": "proportional",
+  "investors": [
+    { "code": "KOEL",  "amount": 25000, "joined": "2026-06-14", "note": "Sample row — replace" },
+    { "code": "NEEM",  "amount": 15000, "joined": "2026-06-20", "note": "" },
+    { "code": "SARUS", "amount": 40000, "joined": "2026-07-02", "note": "" },
+    { "code": "AMBER", "amount": 10000, "joined": "2026-07-28", "note": "Joining amount" }
+  ],
+  "ipos": [
+    { "name": "Sample Industries Ltd", "segment": "Mainboard", "opens": "2026-08-11", "closes": "2026-08-14",
+      "priceLow": 118, "priceHigh": 125, "lotSize": 120, "ourStatus": "Applied", "link": "" },
+    { "name": "Placeholder Foods Ltd", "segment": "SME", "opens": "2026-08-18", "closes": "2026-08-20",
+      "priceLow": 92, "priceHigh": 98, "lotSize": 1200, "ourStatus": "Applying", "link": "" },
+    { "name": "Example Logistics Ltd", "segment": "Mainboard", "opens": "2026-08-25", "closes": "2026-08-27",
+      "priceLow": 305, "priceHigh": 325, "lotSize": 46, "ourStatus": "Not applied", "link": "" },
+    { "name": "Demo Textiles Ltd", "segment": "Mainboard", "opens": "2026-07-21", "closes": "2026-07-23",
+      "priceLow": 210, "priceHigh": 220, "lotSize": 68, "ourStatus": "Allotted", "link": "" }
+  ]
+};
+/* ═════════════════ end of your data ═══════════════════════════ */
+
+
+const PALETTE = ["#E39B2C","#4F7346","#A34A2E","#2E7D74","#7A4A63","#C9B27C"];
+const STATUSES = ["Not applied","Applying","Applied","Allotted","Not allotted","Skipped"];
+const EDIT = { on:false };
+const $ = id => document.getElementById(id);
+
+const rupees = n => "₹" + Math.round(n || 0).toLocaleString("en-IN");
+const compact = n => n >= 1e7 ? "₹" + (n/1e7).toFixed(2) + " cr"
+                  : n >= 1e5 ? "₹" + (n/1e5).toFixed(2) + " L" : rupees(n);
+const today = () => { const d = new Date(); d.setHours(0,0,0,0); return d; };
+const todayISO = () => { const d = new Date();
+  return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); };
+const parseDate = s => { const d = new Date(s + "T00:00:00"); return isNaN(d) ? null : d; };
+const prettyDate = s => { const d = parseDate(s); return d ? d.toLocaleDateString("en-IN",{day:"numeric",month:"short"}) : "—"; };
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const poolTotal = () => DATA.investors.reduce((s,i) => s + (Number(i.amount)||0), 0);
+
+function ipoPhase(ipo){
+  const t = today(), o = parseDate(ipo.opens), c = parseDate(ipo.closes);
+  if (!o || !c) return { key:"soon", rank:1, label:"Dates missing" };
+  if (t < o){ const d = Math.ceil((o-t)/86400000);
+    return { key:"soon", rank:1, label: d === 1 ? "Opens tomorrow" : "Opens in " + d + " days" }; }
+  if (t <= c){ const d = Math.ceil((c-t)/86400000);
+    return { key:"open", rank:0, label: d === 0 ? "Closes today" : "Open — " + d + "d left" }; }
+  return { key:"closed", rank:2, label:"Closed" };
+}
+
+function refLink(ipo){
+  if (ipo.link && /^https?:\/\//i.test(ipo.link)) return ipo.link;
+  return "https://www.google.com/search?q=" + encodeURIComponent((ipo.name || "") + " IPO details");
+}
+
+/* ── Pool ────────────────────────────────────────────────────── */
+function renderPool(){
+  const total = poolTotal(), list = DATA.investors;
+  $("poolTotal").textContent = rupees(total);
+  $("poolCaption").textContent = total ? compact(total) + " contributed so far" : "nothing in the pool yet";
+  $("mCount").textContent = list.length;
+  const amts = list.map(i => Number(i.amount)||0);
+  $("mMax").textContent = amts.length ? compact(Math.max(...amts)) : "—";
+  $("mAvg").textContent = amts.length ? compact(total/amts.length) : "—";
+
+  const bar = $("poolBar"); bar.innerHTML = "";
+  if (!total){
+    $("barLegend").textContent = EDIT.on ? "Add someone below and this band fills up." : "Nothing recorded yet.";
+  } else {
+    list.forEach((inv,n) => {
+      const pct = (Number(inv.amount)||0)/total*100;
+      const seg = document.createElement("div");
+      seg.className = "seg";
+      seg.style.width = pct + "%";
+      seg.style.background = PALETTE[n % PALETTE.length];
+      seg.style.animationDelay = (n*0.07) + "s";
+      seg.title = inv.code + " — " + rupees(inv.amount) + " (" + pct.toFixed(1) + "%)";
+      if (pct > 7) seg.innerHTML = "<span>" + esc(inv.code) + "</span>";
+      bar.appendChild(seg);
+    });
+    $("barLegend").textContent = list.length + " " + (list.length === 1 ? "member" : "members") + " · hover a band for the exact amount";
+  }
+  document.querySelectorAll("[data-split]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.split === DATA.returnSplit)));
+}
+
+/* ── Investors ───────────────────────────────────────────────── */
+function renderInvestors(){
+  const total = poolTotal(), n = DATA.investors.length, body = $("investorRows");
+  if (!n){
+    body.innerHTML = '<tr><td colspan="7" class="muted" style="padding:2rem 1rem">No one has joined yet.</td></tr>';
+    return;
+  }
+  body.innerHTML = DATA.investors.map((inv,idx) => {
+    const amt = Number(inv.amount)||0;
+    const poolPct = total ? amt/total*100 : 0;
+    const retPct = DATA.returnSplit === "equal" ? 100/n : poolPct;
+    return '<tr>' +
+      '<td data-label="Code name"><span class="swatch" style="background:' + PALETTE[idx % PALETTE.length] + '"></span><span class="code">' + esc(inv.code) + '</span></td>' +
+      '<td data-label="Amount in" class="num">' + rupees(amt) + '</td>' +
+      '<td data-label="Share of pool" class="num">' + poolPct.toFixed(1) + '%</td>' +
+      '<td data-label="Share of returns" class="num">' + retPct.toFixed(1) + '%</td>' +
+      '<td data-label="Joined" class="num muted">' + prettyDate(inv.joined) + '</td>' +
+      '<td data-label="Note" class="muted">' + (esc(inv.note) || '—') + '</td>' +
+      '<td data-label="" class="owner-only"><button class="rm" data-remove-investor="' + idx + '" aria-label="Remove ' + esc(inv.code) + '">&times;</button></td>' +
+    '</tr>';
+  }).join("");
+}
+
+/* ── IPOs ────────────────────────────────────────────────────── */
+function renderIpos(){
+  const total = poolTotal(), body = $("ipoRows");
+  if (!DATA.ipos.length){
+    body.innerHTML = '<tr><td colspan="9" class="muted" style="padding:2rem 1rem">No IPOs listed yet.</td></tr>';
+    return;
+  }
+  const rows = DATA.ipos.map((ipo,idx) => ({ipo, idx, phase: ipoPhase(ipo)}))
+    .sort((a,b) => a.phase.rank - b.phase.rank || String(a.ipo.opens).localeCompare(String(b.ipo.opens)));
+
+  body.innerHTML = rows.map(({ipo, idx, phase}) => {
+    const perLot = (Number(ipo.lotSize)||0) * (Number(ipo.priceHigh)||0);
+    const lots = perLot > 0 ? Math.floor(total/perLot) : 0;
+    const status = ipo.ourStatus || "Not applied";
+    const tone = (status === "Applied" || status === "Allotted") ? "go" : (status === "Applying") ? "warm" : "";
+    const options = STATUSES.map(s => '<option' + (s === status ? ' selected' : '') + '>' + s + '</option>').join("");
+    return '<tr>' +
+      '<td data-label="IPO"><strong>' + esc(ipo.name) + '</strong><span class="sub">' + esc(ipo.segment||"") +
+        ' · <a class="hist" href="' + esc(refLink(ipo)) + '" target="_blank" rel="noopener">Details &#8599;</a></span></td>' +
+      '<td data-label="Window" class="num">' + prettyDate(ipo.opens) + ' – ' + prettyDate(ipo.closes) + '</td>' +
+      '<td data-label="Status"><span class="pill ' + phase.key + '">' + esc(phase.label) + '</span></td>' +
+      '<td data-label="Price band" class="num">₹' + (ipo.priceLow||0) + '–' + (ipo.priceHigh||0) + '</td>' +
+      '<td data-label="Lot" class="num">' + (Number(ipo.lotSize)||0).toLocaleString("en-IN") + '<span class="sub">shares</span></td>' +
+      '<td data-label="Cost per lot" class="num">' + rupees(perLot) + '</td>' +
+      '<td data-label="Lots we can fund" class="num">' + (perLot > 0 ? lots + (lots === 1 ? ' lot' : ' lots') : '—') + '</td>' +
+      '<td data-label="Applied / applying"><select class="status" data-tone="' + tone + '" data-ipo="' + idx + '"' + (EDIT.on ? '' : ' disabled') + '>' + options + '</select></td>' +
+      '<td data-label="" class="owner-only"><button class="rm" data-remove-ipo="' + idx + '" aria-label="Remove ' + esc(ipo.name) + '">&times;</button></td>' +
+    '</tr>';
+  }).join("");
+}
+
+function renderAll(){
+  document.body.classList.toggle("editing", EDIT.on);
+  renderPool(); renderInvestors(); renderIpos();
+  $("asOf").textContent = "Private ledger · " +
+    today().toLocaleDateString("en-IN",{day:"numeric",month:"long",year:"numeric"}) +
+    (EDIT.on ? " · editing on" : " · read only");
+  $("lockBtn").textContent = EDIT.on ? "Editing on — lock again" : "Editing locked — unlock";
+  const box = $("dataOut");
+  if (box && !box.hidden) box.value = dataBlock();
+}
+
+/* ── Unlocking ───────────────────────────────────────────────── */
+async function sha256(text){
+  if (!(window.crypto && window.crypto.subtle)) return null;
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,"0")).join("");
+}
+$("lockBtn").addEventListener("click", () => {
+  if (EDIT.on){ EDIT.on = false; $("lockMsg").textContent = ""; $("lockForm").hidden = true; renderAll(); return; }
+  const f = $("lockForm");
+  f.hidden = !f.hidden;
+  if (!f.hidden) $("lockPass").focus();
+});
+$("lockForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const hash = await sha256($("lockPass").value);
+  if (hash === null){ $("lockMsg").textContent = "Needs an https page — open the live site, not a local file."; return; }
+  if (hash === PASS_HASH){
+    EDIT.on = true; $("lockForm").hidden = true; $("lockPass").value = "";
+    $("lockMsg").textContent = "Unlocked."; renderAll();
+  } else {
+    $("lockMsg").textContent = "Wrong passphrase.";
+    $("lockPass").select();
+  }
+});
+
+/* ── Editing ─────────────────────────────────────────────────── */
+$("addInvestor").addEventListener("click", () => {
+  if (!EDIT.on) return;
+  const code = $("iCode").value.trim().toUpperCase(), amount = Number($("iAmt").value);
+  if (!code){ $("iCode").focus(); return; }
+  if (!(amount > 0)){ $("iAmt").focus(); return; }
+  DATA.investors.push({ code, amount, joined: $("iDate").value || todayISO(), note: $("iNote").value.trim() });
+  ["iCode","iAmt","iNote"].forEach(id => $(id).value = "");
+  renderAll();
+});
+
+$("addIpo").addEventListener("click", () => {
+  if (!EDIT.on) return;
+  const name = $("pName").value.trim();
+  if (!name){ $("pName").focus(); return; }
+  DATA.ipos.push({
+    name, segment: $("pSeg").value,
+    opens: $("pOpen").value, closes: $("pClose").value,
+    priceLow: Number($("pLow").value)||0, priceHigh: Number($("pHigh").value)||0,
+    lotSize: Number($("pLot").value)||0, ourStatus: "Not applied",
+    link: $("pUrl").value.trim()
+  });
+  ["pName","pOpen","pClose","pLow","pHigh","pLot","pUrl"].forEach(id => $(id).value = "");
+  renderAll();
+});
+
+document.addEventListener("click", e => {
+  const sp = e.target.closest("[data-split]");
+  if (sp && EDIT.on){ DATA.returnSplit = sp.dataset.split; renderAll(); return; }
+  if (!EDIT.on) return;
+  const ri = e.target.closest("[data-remove-investor]");
+  if (ri){ DATA.investors.splice(Number(ri.dataset.removeInvestor),1); renderAll(); return; }
+  const rp = e.target.closest("[data-remove-ipo]");
+  if (rp){ DATA.ipos.splice(Number(rp.dataset.removeIpo),1); renderAll(); }
+});
+
+document.addEventListener("change", e => {
+  if (!EDIT.on) return;
+  const sel = e.target.closest("select.status");
+  if (sel){ DATA.ipos[Number(sel.dataset.ipo)].ourStatus = sel.value; renderAll(); }
+});
+
+/* ── Export ──────────────────────────────────────────────────── */
+function dataBlock(){ return "const DATA = " + JSON.stringify(DATA, null, 2) + ";"; }
+function flash(msg){ const t = $("toast"); t.textContent = msg; t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 2800); }
+$("copyData").addEventListener("click", async () => {
+  const text = dataBlock();
+  try { await navigator.clipboard.writeText(text); flash("Copied — now paste it into index.html"); }
+  catch { const b = $("dataOut"); b.hidden = false; b.value = text; b.select(); flash("Clipboard blocked — copy the text below"); }
+});
+$("showData").addEventListener("click", () => {
+  const b = $("dataOut"); b.hidden = !b.hidden;
+  if (!b.hidden){ b.value = dataBlock(); b.focus(); }
+});
+
+renderAll();
+</script>
+</body>
+</html>
