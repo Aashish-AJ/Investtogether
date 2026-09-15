@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Invest Together — set up passphrases</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0E2E2A;--paper:#F3F0E5;--paper-hi:#FBF9F2;--marigold:#E39B2C;--brick:#A34A2E;--moss:#4F7346;--rule:rgba(14,46,42,.3);--mono:"IBM Plex Mono",monospace}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Instrument Sans",system-ui,sans-serif;line-height:1.55;padding:2.5rem 1.25rem}
+.card{max-width:40rem;margin:0 auto}
+h1{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:clamp(1.8rem,6vw,2.6rem);letter-spacing:-.03em;margin:0 0 .3rem;text-transform:uppercase;line-height:1}
+.sub{margin:0 0 2rem;color:rgba(14,46,42,.75)}
+.step{background:var(--paper-hi);border:1px solid var(--rule);border-radius:2px;padding:1.25rem;margin-bottom:1rem}
+.step h2{font-family:var(--mono);font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;margin:0 0 .75rem;color:rgba(14,46,42,.7);font-weight:500}
+label{display:block;font-family:var(--mono);font-size:.64rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(14,46,42,.7);margin:.9rem 0 .3rem}
+input[type=text],input[type=file]{width:100%;font-family:var(--mono);font-size:.9rem;padding:.6rem .7rem;border:1px solid var(--rule);border-radius:2px;background:var(--paper);color:var(--ink)}
+.hint{font-size:.82rem;color:rgba(14,46,42,.6);margin:.35rem 0 0}
+button{width:100%;font-family:var(--mono);font-size:.9rem;font-weight:600;padding:.85rem;border:none;border-radius:2px;background:var(--ink);color:var(--paper-hi);cursor:pointer;margin-top:1.5rem}
+button:disabled{opacity:.4;cursor:not-allowed}
+#msg{font-family:var(--mono);font-size:.82rem;margin-top:1rem;min-height:1.3em}
+.ok{color:var(--moss)}.bad{color:var(--brick)}
+.note{font-size:.85rem;background:rgba(227,155,44,.15);border-left:3px solid var(--marigold);padding:.8rem 1rem;margin-top:1.5rem}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>Set up passphrases</h1>
+  <p class="sub">This runs entirely on your own computer. Nothing you type here is sent anywhere.</p>
+
+  <div class="step">
+    <h2>1 · Your current file</h2>
+    <label for="file">Pick index.html from your Downloads</label>
+    <input type="file" id="file" accept=".html,text/html">
+    <p class="hint">Broken or working, either is fine — it gets rebuilt.</p>
+  </div>
+
+  <div class="step">
+    <h2>2 · Two new passphrases</h2>
+    <label for="view">Viewing passphrase — share this with family</label>
+    <input type="text" id="view" placeholder="e.g. copper lantern monday" autocomplete="off">
+    <label for="owner">Owner passphrase — keep this to yourself</label>
+    <input type="text" id="owner" placeholder="e.g. river kettle ninety" autocomplete="off">
+    <p class="hint">Make them different from each other, and different from anything you use elsewhere. Three unrelated words is easy to say over the phone and hard to guess.</p>
+  </div>
+
+  <div class="step">
+    <h2>3 · Keeping your existing records</h2>
+    <label for="oldview">Current viewing passphrase</label>
+    <input type="text" id="oldview" placeholder="leave blank to start with an empty ledger" autocomplete="off">
+    <p class="hint">Fill this in if the file already holds investors and IPOs you want to keep — they get carried across and re-encrypted under the new passphrase. Leave it blank only if the file is broken or empty.</p>
+  </div>
+
+  <button id="go" disabled>Build my file</button>
+  <p id="msg"></p>
+
+  <div class="note">
+If you leave box 3 blank, the ledger starts empty. Open the rebuilt site, enter the viewing passphrase, unlock editing with the owner one, and add the real investors and IPOs there.
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const STARTER = { returnSplit:"proportional", investors:[], ipos:[] };
+
+function b64(bytes){ let s=""; for (let i=0;i<bytes.length;i++) s+=String.fromCharCode(bytes[i]); return btoa(s); }
+async function deriveKey(pass, salt){
+  const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(pass), "PBKDF2", false, ["deriveKey"]);
+  return crypto.subtle.deriveKey({name:"PBKDF2",salt,iterations:250000,hash:"SHA-256"}, base, {name:"AES-GCM",length:256}, false, ["encrypt","decrypt"]);
+}
+async function encryptRecords(pass, obj){
+  const salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12));
+  const key = await deriveKey(pass, salt);
+  const ct = new Uint8Array(await crypto.subtle.encrypt({name:"AES-GCM",iv}, key, new TextEncoder().encode(JSON.stringify(obj))));
+  const out = new Uint8Array(28+ct.length); out.set(salt,0); out.set(iv,16); out.set(ct,28);
+  return b64(out);
+}
+async function decryptRecords(html, pass){
+  const m = html.match(/const ENCRYPTED = "([^"]*)";/);
+  const raw = Uint8Array.from(atob(m[1]), c => c.charCodeAt(0));
+  const key = await deriveKey(pass, raw.slice(0,16));
+  const plain = await crypto.subtle.decrypt({name:"AES-GCM", iv: raw.slice(16,28)}, key, raw.slice(28));
+  return JSON.parse(new TextDecoder().decode(plain));
+}
+async function sha256(t){
+  const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(t));
+  return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,"0")).join("");
+}
+
+function check(){
+  $("go").disabled = !($("file").files.length && $("view").value.trim() && $("owner").value.trim());
+}
+["file","view","owner"].forEach(id => $(id).addEventListener("input", check));
+
+$("go").addEventListener("click", async () => {
+  const msg = $("msg");
+  const view = $("view").value.trim(), owner = $("owner").value.trim();
+  if (view === owner){ msg.className="bad"; msg.textContent="Use two different passphrases."; return; }
+  msg.className=""; msg.textContent="Building…";
+  try {
+    let html = await $("file").files[0].text();
+    if (!/const PASS_HASH = "[^"]*";/.test(html) || !/const ENCRYPTED = "[^"]*";/.test(html)){
+      msg.className="bad"; msg.textContent="That does not look like the Invest Together index.html."; return;
+    }
+    let records = STARTER;
+    const oldView = $("oldview").value.trim();
+    if (oldView){
+      try { records = await decryptRecords(html, oldView); }
+      catch {
+        msg.className="bad";
+        msg.textContent="That current viewing passphrase does not open the file. Nothing was changed — check it, or leave the box blank to start empty.";
+        return;
+      }
+      const n = (records.investors||[]).length, k = (records.ipos||[]).length;
+      msg.textContent = "Carrying across " + n + " investor(s) and " + k + " IPO(s)…";
+    }
+    html = html.replace(/const PASS_HASH = "[^"]*";/, 'const PASS_HASH = "' + await sha256(owner) + '";');
+    html = html.replace(/const ENCRYPTED = "[^"]*";/, 'const ENCRYPTED = "' + await encryptRecords(view, records) + '";');
+    const url = URL.createObjectURL(new Blob([html], {type:"text/html"}));
+    const a = document.createElement("a");
+    a.href = url; a.download = "index.html"; a.click();
+    URL.revokeObjectURL(url);
+    msg.className="ok"; msg.textContent="Done — index.html downloaded. Upload it to your repository, replacing the old one.";
+  } catch (e){
+    msg.className="bad"; msg.textContent="Something went wrong: " + e.message;
+  }
+});
+</script>
+</body>
+</html>
